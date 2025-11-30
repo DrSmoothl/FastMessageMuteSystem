@@ -1,0 +1,23 @@
+[project]
+name = "fast-message-mute-system"
+version = "0.1.0"
+description = "QQ群刷屏自动禁言系统 - 与NapCat交互"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "websockets>=12.0",
+    "httpx>=0.27.0",
+    "tomli>=2.0.1",
+    "tomli-w>=1.0.0",
+    "loguru>=0.7.2",
+]
+
+[project.scripts]
+mute-bot = "src.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
