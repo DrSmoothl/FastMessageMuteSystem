@@ -79,5 +79,4 @@ FastMessageMuteSystem/
 ```
 
 ## License
-
-MIT
+AGPL-v3 or later
