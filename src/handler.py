@@ -169,8 +169,8 @@ class MessageHandler:
             # 执行禁言
             try:
                 await self.client.set_group_ban(group_id, user_id, mute_duration)
-                # 发送带@的提示消息
-                await self._reply_with_at(
+                # 发送带@的提示消息（不等待响应，避免高并发时超时）
+                await self._reply_with_at_async(
                     group_id,
                     user_id,
                     f"⚠️ 检测到刷屏行为，已被禁言 {self._format_duration(mute_duration)}"
@@ -193,15 +193,22 @@ class MessageHandler:
             return f"{hours}小时"
     
     async def _reply(self, group_id: int, message: str):
-        """发送群消息"""
+        """发送群消息（等待响应）"""
         try:
             await self.client.send_group_msg(group_id, message)
         except Exception as e:
             logger.error(f"发送消息失败: {e}")
     
     async def _reply_with_at(self, group_id: int, user_id: int, message: str):
-        """发送带@的群消息"""
+        """发送带@的群消息（等待响应）"""
         try:
             await self.client.send_group_msg_with_at(group_id, user_id, message)
+        except Exception as e:
+            logger.error(f"发送消息失败: {e}")
+    
+    async def _reply_with_at_async(self, group_id: int, user_id: int, message: str):
+        """发送带@的群消息（不等待响应，fire and forget）"""
+        try:
+            await self.client.send_group_msg_with_at(group_id, user_id, message, wait_response=False)
         except Exception as e:
             logger.error(f"发送消息失败: {e}")

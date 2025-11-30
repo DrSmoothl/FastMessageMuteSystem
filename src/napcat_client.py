@@ -141,10 +141,30 @@ class NapcatClient:
             logger.debug(f"API 响应已收到: {action}, echo={echo}")
             return result
         except asyncio.TimeoutError:
-            logger.error(f"API 调用超时: {action}")
+            logger.warning(f"API 调用超时: {action}")
             raise
         finally:
             self._echo_callbacks.pop(echo, None)
+    
+    async def call_api_no_wait(self, action: str, params: dict = None):
+        """
+        调用 NapCat API，不等待响应（fire and forget）
+        适用于非关键操作如发送提示消息
+        
+        Args:
+            action: API 动作名称
+            params: API 参数
+        """
+        if not self.ws:
+            raise RuntimeError("WebSocket 未连接")
+        
+        request = {
+            "action": action,
+            "params": params or {},
+        }
+        
+        await self.ws.send(json.dumps(request))
+        logger.debug(f"API 请求已发送(不等待): {action}")
     
     # ==================== API 封装 ====================
     
@@ -166,7 +186,7 @@ class NapcatClient:
             "duration": duration
         })
     
-    async def send_group_msg(self, group_id: int, message: str | list) -> dict:
+    async def send_group_msg(self, group_id: int, message: str | list, wait_response: bool = True) -> dict | None:
         """
         发送群消息
         
@@ -174,16 +194,22 @@ class NapcatClient:
             group_id: 群号
             message: 消息内容，可以是字符串或消息段数组
                      消息段格式: [{"type": "text", "data": {"text": "内容"}}]
+            wait_response: 是否等待响应，默认True
         
         Returns:
-            API 响应
+            API 响应，如果 wait_response=False 则返回 None
         """
-        return await self.call_api("send_group_msg", {
+        params = {
             "group_id": group_id,
             "message": message
-        })
+        }
+        if wait_response:
+            return await self.call_api("send_group_msg", params)
+        else:
+            await self.call_api_no_wait("send_group_msg", params)
+            return None
     
-    async def send_group_msg_with_at(self, group_id: int, user_id: int, text: str) -> dict:
+    async def send_group_msg_with_at(self, group_id: int, user_id: int, text: str, wait_response: bool = True) -> dict | None:
         """
         发送带@的群消息
         
@@ -191,15 +217,16 @@ class NapcatClient:
             group_id: 群号
             user_id: 要@的用户QQ号
             text: 消息文本
+            wait_response: 是否等待响应，默认True
         
         Returns:
-            API 响应
+            API 响应，如果 wait_response=False 则返回 None
         """
         message = [
             {"type": "at", "data": {"qq": str(user_id)}},
             {"type": "text", "data": {"text": f" {text}"}}
         ]
-        return await self.send_group_msg(group_id, message)
+        return await self.send_group_msg(group_id, message, wait_response)
     
     async def get_group_member_info(self, group_id: int, user_id: int) -> dict:
         """
