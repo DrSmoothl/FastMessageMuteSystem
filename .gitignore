@@ -39,6 +39,9 @@ uv.lock
 logs/
 *.log
 
+# 配置文件（包含敏感信息）
+config.toml
+
 # Data (持久化状态)
 data/
 

@@ -1,35 +1,40 @@
-# 快速消息禁言系统配置文件
+# 快速消息禁言系统配置文件示例
+# 使用方法：
+# 1. 复制此文件并重命名为 config.toml
+# 2. 根据你的实际情况修改配置项
 
 [napcat]
 # NapCat WebSocket 连接地址
-ws_url = "ws://127.0.0.1:3001"
+ws_url = "ws://127.0.0.1:3002"
 # NapCat HTTP API 地址 (用于主动调用)
 http_url = "http://127.0.0.1:3000"
 # 访问令牌 (如果NapCat配置了access_token)
 access_token = ""
 
 [bot]
-# 机器人QQ号
-bot_qq = 1206069534
+# 机器人QQ号 - 请修改为你的机器人QQ号
+bot_qq = 123456789
 
 [monitor]
-# 监控的群号列表
-groups = [1022489779]
+# 监控的群号列表 - 请修改为你要监控的群号
+groups = [123456789, 987654321]
 
-# 管理员QQ号列表 (可以使用命令开关功能)
-admins = [1787882683]
+# 管理员QQ号列表 (可以使用命令开关功能) - 请修改为管理员的QQ号
+admins = [123456789]
 
 [mute]
 # 刷屏检测时间窗口 (秒)
-time_window = 5
+time_window = 20
 # 时间窗口内消息数量阈值，超过此数量触发禁言
-message_threshold = 3
+message_threshold = 4
 # 禁言时长 (秒)，0表示解除禁言
-mute_duration = 3600
+# 默认 36000 秒 = 10 小时
+mute_duration = 36000
 # 累计触发次数增加禁言时长的倍数
 mute_multiplier = 2.0
 # 最大禁言时长 (秒)
-max_mute_duration = 36000
+# 默认 360000 秒 = 100 小时
+max_mute_duration = 360000
 
 [commands]
 # 命令前缀
